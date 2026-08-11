@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import ScreenHeader from '../../components/ScreenHeader';
-import CongestionBadge, { CongestionLevel } from '../../components/CongestionBadge';
-import { COLORS, SPACING, RADIUS } from '../../constants/theme';
+import ScreenHeader from '@/components/ScreenHeader';
+import CongestionBadge, { CongestionLevel } from '@/components/CongestionBadge';
+import { COLORS, SPACING, RADIUS } from '@/constants/theme';
 
 const RECOMMENDATIONS: { name: string; population: string; level: CongestionLevel }[] = [
   { name: '강남역 11번 출구', population: '약 4,500명', level: '매우혼잡' },

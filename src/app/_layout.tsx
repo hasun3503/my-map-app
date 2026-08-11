@@ -1,6 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { COLORS } from '../../constants/theme';
+import type { ColorValue } from 'react-native';
+import { COLORS } from '@/constants/theme';
+
+type TabBarIconProps = {
+  color: ColorValue;
+  size: number;
+};
 
 export default function TabLayout() {
   return (
@@ -26,7 +32,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: '날씨',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size }: TabBarIconProps) => (
             <Ionicons name="cloud-outline" size={size} color={color} />
           ),
         }}
@@ -35,7 +41,7 @@ export default function TabLayout() {
         name="density"
         options={{
           title: '유동인구',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size }: TabBarIconProps) => (
             <Ionicons name="people-outline" size={size} color={color} />
           ),
         }}
@@ -44,7 +50,7 @@ export default function TabLayout() {
         name="map"
         options={{
           title: '지도',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size }: TabBarIconProps) => (
             <Ionicons name="location-outline" size={size} color={color} />
           ),
         }}

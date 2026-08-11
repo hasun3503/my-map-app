@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import ScreenHeader from '../../components/ScreenHeader';
-import { COLORS, SPACING, RADIUS } from '../../constants/theme';
+import ScreenHeader from '@/components/ScreenHeader';
+import { COLORS, SPACING, RADIUS } from '@/constants/theme';
 
 const HOURLY = [
   { time: '14시', icon: 'sunny', temp: 28 },

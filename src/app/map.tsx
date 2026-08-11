@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import ScreenHeader from '../../components/ScreenHeader';
-import { COLORS, SPACING, RADIUS } from '../../constants/theme';
+import ScreenHeader from '@/components/ScreenHeader';
+import { COLORS, SPACING, RADIUS } from '@/constants/theme';
 
 const FILTERS = ['주민센터', '운동센터', '지역상업 찾기'];
 
@@ -12,7 +12,12 @@ const FILTERS = ['주민센터', '운동센터', '지역상업 찾기'];
 const PINS = [
   { id: '1', top: '30%', left: '25%', count: 67 },
   { id: '2', top: '55%', left: '60%', count: 30 },
-];
+] as const satisfies ReadonlyArray<{
+  id: string;
+  top: `${number}%`;
+  left: `${number}%`;
+  count: number;
+}>;
 
 export default function MapScreen() {
   return (
