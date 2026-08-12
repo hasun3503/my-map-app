@@ -1,23 +1,116 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Platform, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import ScreenHeader from '@/components/ScreenHeader';
 import { COLORS, SPACING, RADIUS } from '@/constants/theme';
+import { WebView } from 'react-native-webview';
 
 const FILTERS = ['주민센터', '운동센터', '지역상업 찾기'];
+const clientId = process.env.EXPO_PUBLIC_NAVER_MAP_CLIENT_ID ?? '';
 
-// NOTE: 좌표는 임시 배치 값입니다. 실제 지도 연동 시 react-native-maps의
-// Marker 컴포넌트로 교체하고, 실제 위도/경도 값을 사용하세요.
-const PINS = [
-  { id: '1', top: '30%', left: '25%', count: 67 },
-  { id: '2', top: '55%', left: '60%', count: 30 },
-] as const satisfies ReadonlyArray<{
-  id: string;
-  top: `${number}%`;
-  left: `${number}%`;
-  count: number;
-}>;
+const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+  />
+  <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}"></script>
+  <style>
+    html, body, #map {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    window.onload = function () {
+      var mapOptions = {
+        center: new naver.maps.LatLng(37.3595704, 127.105399),
+        zoom: 10
+      };
+
+      var map = new naver.maps.Map('map', mapOptions);
+    };
+  </script>
+</body>
+</html>
+`;
+
+function WebMap() {
+  const mapRef = useRef<any>(null);
+
+  useEffect(() => {
+    const container = mapRef.current;
+    const naverMaps = (window as any).naver?.maps;
+
+    if (!container || !clientId) {
+      return;
+    }
+
+    if (naverMaps) {
+      new naverMaps.Map(container, {
+        center: new naverMaps.LatLng(37.3595704, 127.105399),
+        zoom: 10,
+      });
+
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}`;
+    script.async = true;
+
+    script.onload = () => {
+      if (!container) {
+        return;
+      }
+
+      const loadedNaverMaps = (window as any).naver?.maps;
+
+      if (!loadedNaverMaps) {
+        return;
+      }
+
+      new loadedNaverMaps.Map(container, {
+        center: new loadedNaverMaps.LatLng(37.3595704, 127.105399),
+        zoom: 10,
+      });
+    };
+
+    document.head.appendChild(script);
+
+    return () => {
+      script.remove();
+      container.innerHTML = '';
+    };
+  }, []);
+
+  return <View ref={mapRef} style={{ flex: 1 }} />;
+}
+
+function renderMap() {
+  if (Platform.OS === 'web') {
+    return <WebMap />;
+  }
+
+  return (
+    <WebView
+      originWhitelist={['*']}
+      source={{ html }}
+      style={{ flex: 1 }}
+    />
+  );
+}
 
 export default function MapScreen() {
   return (
@@ -32,13 +125,8 @@ export default function MapScreen() {
         ))}
       </View>
 
-      {/* 실제 지도 영역 - 추후 react-native-maps의 MapView로 교체 */}
       <View style={styles.mapArea}>
-        {PINS.map((pin) => (
-          <View key={pin.id} style={[styles.pin, { top: pin.top, left: pin.left }]}>
-            <Text style={styles.pinText}>{pin.count}</Text>
-          </View>
-        ))}
+        {renderMap()}
 
         <View style={styles.mapActions}>
           <TouchableOpacity style={styles.mapActionButton}>
@@ -49,7 +137,6 @@ export default function MapScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* 선택한 위치 정보 카드 */}
         <View style={styles.infoCard}>
           <View style={styles.infoThumb} />
           <View style={{ flex: 1 }}>
