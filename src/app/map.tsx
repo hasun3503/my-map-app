@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Platform, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Platform, View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import ScreenHeader from '@/components/ScreenHeader';
@@ -113,6 +113,12 @@ function renderMap() {
 }
 
 export default function MapScreen() {
+  const handleFilterPress = (filter: string) => {
+    if (filter === '정부 24') {
+      Linking.openURL('https://plus.gov.kr/');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScreenHeader location="서울특별시 강남구" />
@@ -124,7 +130,7 @@ export default function MapScreen() {
             style={styles.filterChip}
             activeOpacity={0.7}
             accessibilityRole="button"
-            onPress={() => {}}
+            onPress={() => handleFilterPress(f)}
           >
             <Text style={styles.filterText}>{f}</Text>
           </TouchableOpacity>
