@@ -6,7 +6,7 @@ import ScreenHeader from '@/components/ScreenHeader';
 import { COLORS, SPACING, RADIUS } from '@/constants/theme';
 import { WebView } from 'react-native-webview';
 
-const FILTERS = ['주민센터', '운동센터', '지역상업 찾기'];
+const FILTERS = ['주민센터', '운동센터', '지역사업 찾기', '공원', '지하철', '정부 24', 'Q&A'];
 const clientId = process.env.EXPO_PUBLIC_NAVER_MAP_CLIENT_ID ?? '';
 
 const html = `
@@ -119,7 +119,13 @@ export default function MapScreen() {
 
       <View style={styles.filterRow}>
         {FILTERS.map((f) => (
-          <TouchableOpacity key={f} style={styles.filterChip}>
+          <TouchableOpacity
+            key={f}
+            style={styles.filterChip}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            onPress={() => {}}
+          >
             <Text style={styles.filterText}>{f}</Text>
           </TouchableOpacity>
         ))}
@@ -154,17 +160,22 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.background },
   filterRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: SPACING.sm,
     paddingHorizontal: SPACING.md,
     marginBottom: SPACING.md,
   },
   filterChip: {
-    backgroundColor: COLORS.card,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
     borderRadius: RADIUS.pill,
   },
-  filterText: { color: COLORS.textPrimary, fontSize: 12 },
+  filterText: {
+    color: COLORS.textPrimary,
+    fontSize: 12,
+    fontWeight: '500',
+  },
   mapArea: {
     flex: 1,
     marginHorizontal: SPACING.md,
