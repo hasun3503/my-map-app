@@ -7,12 +7,11 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_timezone: str = "Asia/Seoul"
 
-    kma_service_key: str
-    seoul_api_key: str
+    kma_apihub_auth_key: str
+    kma_apihub_base_url: str = "https://apihub.kma.go.kr"
 
-    kma_api_base_url: str = "https://apis.data.go.kr"
+    seoul_api_key: str | None = None
     seoul_api_base_url: str = "http://openapi.seoul.go.kr:8088"
-    redis_url: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",
