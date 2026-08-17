@@ -1,0 +1,6 @@
+# External API requests
+httpx>=0.27,<1.0
+
+# Environment variable and API key settings
+pydantic-settings>=2.0,<3.0
+python-dotenv>=1.0,<2.0
