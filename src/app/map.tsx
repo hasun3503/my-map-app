@@ -31,6 +31,13 @@ interface MapPlace {
   y?: number;
 }
 
+interface SearchPlace {
+  name: string;
+  address: string;
+  x: number;
+  y: number;
+}
+
 interface FilterSummary {
   filter: PlaceFilter;
   count: number;
@@ -43,28 +50,26 @@ interface ClickedDensityArea {
   population: number;
 }
 
-const PLACE_QUERIES: Record<PlaceFilter, string[]> = {
+// 더 다양한 키워드로 확장
+const PLACE_KEYWORDS: Record<PlaceFilter, string[]> = {
   주민센터: [
-    '역삼1동주민센터',
-    '역삼2동주민센터',
-    '삼성1동주민센터',
-    '청담동주민센터',
+    '행정동', '주민센터', '행정복지센터', '행정센터', '무더위쉼터', '주민자치센터',
   ],
   운동센터: [
-    '강남구민체육관',
-    '역삼문화체육센터',
-    '강남스포츠문화센터',
-    '삼성동 체육센터',
+    '체육관', '운동센터', '스포츠센터', '피트니스센터', '구민체육센터',
   ],
   '지역사업 찾기': [
-    '강남구청',
-    '강남구 도시관리공단',
-    '강남구 일자리센터',
-    '강남구 평생학습센터',
+    '일자리센터', '평생학습센터', '지역사업', '복지사업', '사회적경제지원센터',
   ],
-  공원: ['선정릉', '도산공원', '양재천', '봉은사근린공원'],
-  지하철: ['강남역', '역삼역', '선릉역', '삼성역', '신논현역'],
-  'Q&A': ['강남구청 민원실', '강남구청 열린민원실', '국민신문고'],
+  공원: [
+    '공원', '근린공원', '쉼터', '광장', '도시숲', '산책로'
+  ],
+  지하철: [
+    '지하철역', '전철역'
+  ],
+  'Q&A': [
+    '민원실', '주민센터', '구청', '국민신문고', '열린민원실'
+  ]
 };
 
 const FILTER_INFO: Record<string, { title: string; subtitle: string; timestamp: string }> = {
@@ -100,7 +105,7 @@ const FILTER_INFO: Record<string, { title: string; subtitle: string; timestamp: 
   },
 };
 
-const DEFAULT_STATION_QUERIES: string[] = PLACE_QUERIES['지하철'];
+const DEFAULT_STATION_QUERIES: string[] = PLACE_KEYWORDS['지하철'];
 
 const DEFAULT_DENSITY_AREAS: DensityArea[] = DEFAULT_STATION_QUERIES.map((name, idx) => ({
   id: `subway-${idx}-${name}`,
@@ -127,6 +132,7 @@ const DENSITY_COLOR_MAP: Record<DensityLevel, string> = {
 };
 
 const clientId = process.env.EXPO_PUBLIC_NAVER_MAP_CLIENT_ID ?? '';
+const clientSecret = process.env.EXPO_PUBLIC_NAVER_MAP_CLIENT_SECRET ?? '';
 
 function getCategoryLabel(filter: string | null): string {
   if (filter === '지하철') return '지하철역';
@@ -140,7 +146,9 @@ function getCategoryLabel(filter: string | null): string {
 
 function buildHtml(densityAreas: DensityArea[]) {
   const densityJson = JSON.stringify(densityAreas);
-  const placeQueriesJson = JSON.stringify(PLACE_QUERIES);
+  const placeQueriesJson = JSON.stringify(PLACE_KEYWORDS);
+  const clientIdJson = JSON.stringify(clientId);
+  const clientSecretJson = JSON.stringify(clientSecret);
 
   return `
 <!DOCTYPE html>
@@ -152,7 +160,7 @@ function buildHtml(densityAreas: DensityArea[]) {
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
   />
-  <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}&submodules=geocoder"></script>
+   <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}&submodules=geocoder"></script>
   <style>
     html, body, #map {
       width: 100%;
@@ -181,6 +189,9 @@ function buildHtml(densityAreas: DensityArea[]) {
     var activeFilter = null;
     var densityAreas = ${densityJson};
     var placeQueries = ${placeQueriesJson};
+    var clientId = ${clientIdJson};
+    var clientSecret = ${clientSecretJson};
+    var lastSearchResults = [];
 
     var DENSITY_COLOR_MAP = {
       low: 'rgba(63, 185, 80, 0.45)',
@@ -290,58 +301,59 @@ function buildHtml(densityAreas: DensityArea[]) {
       });
     }
 
-    function renderFilterMarkers() {
+    function renderSearchMarkers(places) {
+      lastSearchResults = places || [];
       clearMarkers();
-      if (!activeFilter || !window.naver || !window.naver.maps || !window.naver.maps.Service) {
+      if (!lastSearchResults.length || !window.naver || !window.naver.maps || !window.naver.maps.Service) {
         emitSummary(0);
         return;
       }
-      var queries = placeQueries[activeFilter] || [];
-      if (queries.length === 0) { emitSummary(0); return; }
-
       var categoryLabel = getCategoryLabel(activeFilter);
-      var completed = 0;
-      var visibleCount = 0;
       var bounds = map.getBounds();
+      var visibleCount = 0;
+      var seen = new Set();
 
-      queries.forEach(function (query) {
-        window.naver.maps.Service.geocode({ query: query }, function (status, response) {
-          completed += 1;
-          if (status === window.naver.maps.Service.Status.OK && response.v2 && response.v2.addresses && response.v2.addresses.length > 0) {
-            var item = response.v2.addresses[0];
-            var lat = Number(item.y);
-            var lng = Number(item.x);
-            if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
-              var latLng = new window.naver.maps.LatLng(lat, lng);
-              if (bounds.hasLatLng(latLng)) {
-                var marker = new window.naver.maps.Marker({
-                  position: latLng, map: map, title: query, zIndex: 10,
-                });
-                window.naver.maps.Event.addListener(marker, 'click', function () {
-                  postToApp({
-                    type: 'PLACE_SELECTED',
-                    place: {
-                      name: query,
-                      address: item.roadAddress || item.jibunAddress || '주소 정보 없음',
-                      category: categoryLabel,
-                      x: lng, y: lat,
-                    },
-                  });
-                });
-                markers.push(marker);
-                visibleCount += 1;
+      places.forEach(function (place) {
+        var lat = Number(place.y);
+        var lng = Number(place.x);
+        if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+          var latLng = new window.naver.maps.LatLng(lat, lng);
+          if (bounds.hasLatLng(latLng)) {
+            var key = place.address || place.name;
+            if (seen.has(key)) return;
+            seen.add(key);
+            var marker = new window.naver.maps.Marker({
+              position: latLng,
+              map: map,
+              title: place.name,
+              zIndex: 10,
+              icon: {
+                content: "<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28'><circle cx='14' cy='14' r='10' fill='" + (activeFilter === '주민센터' ? '#4285F4' : activeFilter === '운동센터' ? '#34A853' : activeFilter === '공원' ? '#FFD600' : activeFilter === '지하철' ? '#263B80' : '#666') + "' stroke='#fff' stroke-width='2'/></svg>"
               }
-            }
+            });
+            window.naver.maps.Event.addListener(marker, 'click', function () {
+              postToApp({
+                type: 'PLACE_SELECTED',
+                place: {
+                  name: place.name,
+                  address: place.address || '주소 정보 없음',
+                  category: categoryLabel,
+                  x: lng, y: lat,
+                },
+              });
+            });
+            markers.push(marker);
+            visibleCount += 1;
           }
-          if (completed === queries.length) emitSummary(visibleCount);
-        });
+        }
       });
+      emitSummary(visibleCount);
     }
 
     function applyFilter(filter) {
       activeFilter = filter || null;
-      if (activeFilter) clearPolygons(); else renderDensityPolygons();
-      renderFilterMarkers();
+      if (activeFilter) clearMarkers();
+      else renderDensityPolygons();
     }
 
     function updateDensityAreas(newAreas) {
@@ -354,6 +366,7 @@ function buildHtml(densityAreas: DensityArea[]) {
         var payload = JSON.parse(event.data);
         if (payload.type === 'SET_FILTER') applyFilter(payload.filter);
         else if (payload.type === 'UPDATE_DENSITY') updateDensityAreas(payload.areas);
+        else if (payload.type === 'SEARCH_RESULTS') renderSearchMarkers(payload.places);
       } catch (error) { /* ignore */ }
     }
 
@@ -365,7 +378,7 @@ function buildHtml(densityAreas: DensityArea[]) {
       map = new window.naver.maps.Map('map', mapOptions);
       renderDensityPolygons();
       window.naver.maps.Event.addListener(map, 'idle', function () {
-        if (activeFilter) renderFilterMarkers(); else renderDensityPolygons();
+        if (activeFilter) renderSearchMarkers(lastSearchResults); else renderDensityPolygons();
       });
       document.addEventListener('message', receiveMessage);
       window.addEventListener('message', receiveMessage);
@@ -438,6 +451,51 @@ export default function MapScreen() {
       JSON.stringify({ type: 'UPDATE_DENSITY', areas: densityAreas }),
     );
   }, [densityAreas]);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    if (!activeFilter || !clientId || !clientSecret || !webViewRef.current) return;
+    const keywords = PLACE_KEYWORDS[activeFilter] || [];
+    if (keywords.length === 0) return;
+
+    let cancelled = false;
+
+    async function search() {
+      try {
+        const first = await fetch(
+          'https://openapi.naver.com/v1/search/local.json?query=' + encodeURIComponent(keywords[0]) + '&display=15&sort=random',
+          { headers: { 'X-Naver-Client-Id': clientId, 'X-Naver-Client-Secret': clientSecret } },
+        );
+        const data = await first.json();
+        const places: SearchPlace[] = (data.items || [])
+          .slice(0, 15)
+          .map((item: any) => ({
+            name: item.title || keywords[0],
+            address: item.roadAddress || item.address || '',
+            x: Number(item.mapx),
+            y: Number(item.mapy),
+          }))
+          .filter((p: SearchPlace) => !Number.isNaN(p.x) && !Number.isNaN(p.y));
+
+        if (!cancelled) {
+          webViewRef.current?.postMessage(
+            JSON.stringify({ type: 'SEARCH_RESULTS', places, filter: activeFilter }),
+          );
+        }
+      } catch {
+        if (!cancelled) {
+          webViewRef.current?.postMessage(
+            JSON.stringify({ type: 'SEARCH_RESULTS', places: [], filter: activeFilter }),
+          );
+        }
+      }
+    }
+
+    search();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeFilter, clientId, clientSecret]);
 
   const onMapMessage = useCallback((event: WebViewMessageEvent) => {
     try {
@@ -594,44 +652,115 @@ export default function MapScreen() {
     const filter = webActiveFilterRef.current;
     webClearMarkers();
     if (!filter) { webEmitSummary(0); return; }
-    const queries = PLACE_QUERIES[filter] || [];
-    if (queries.length === 0) { webEmitSummary(0); return; }
+    const keywords = PLACE_KEYWORDS[filter] || [];
+    if (keywords.length === 0) { webEmitSummary(0); return; }
 
     const categoryLabel = getCategoryLabel(filter);
-    let completed = 0;
-    let visibleCount = 0;
     const bounds = map.getBounds();
+    let visibleCount = 0;
+    let completed = 0;
+    const center = map.getCenter();
 
-    queries.forEach((query) => {
-      w.naver.maps.Service.geocode({ query }, (status: any, response: any) => {
-        completed += 1;
-        if (status === w.naver.maps.Service.Status.OK && response.v2 && response.v2.addresses && response.v2.addresses.length > 0) {
-          const item = response.v2.addresses[0];
-          const lat = Number(item.y);
-          const lng = Number(item.x);
-          if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
-            const latLng = new w.naver.maps.LatLng(lat, lng);
-            if (bounds.hasLatLng(latLng)) {
-              const marker = new w.naver.maps.Marker({
-                position: latLng, map, title: query, zIndex: 10,
-              });
-              w.naver.maps.Event.addListener(marker, 'click', () => {
-                setSelectedPlace({
-                  name: query,
-                  address: item.roadAddress || item.jibunAddress || '주소 정보 없음',
-                  category: categoryLabel,
-                  x: lng, y: lat,
-                });
-                setClickedDensityArea(null);
-              });
-              webMarkersRef.current.push(marker);
-              visibleCount += 1;
-            }
-          }
+    function placeMarker(name, address, lat, lng) {
+      lat = Number(lat);
+      lng = Number(lng);
+      if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+        const latLng = new w.naver.maps.LatLng(lat, lng);
+        if (bounds.hasLatLng(latLng)) {
+          const marker = new w.naver.maps.Marker({
+            position: latLng,
+            map,
+            title: name,
+            zIndex: 10,
+            icon: {
+              content: `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28'><circle cx='14' cy='14' r='10' fill='${
+                filter === '주민센터'
+                  ? '#4285F4'
+                  : filter === '운동센터'
+                    ? '#34A853'
+                    : filter === '공원'
+                      ? '#FFD600'
+                      : filter === '지하철'
+                        ? '#263B80'
+                        : '#666'
+              }' stroke='#fff' stroke-width='2'/></svg>`,
+            },
+          });
+          w.naver.maps.Event.addListener(marker, 'click', () => {
+            setSelectedPlace({
+              name,
+              address: address || '주소 정보 없음',
+              category: categoryLabel,
+              x: lng,
+              y: lat,
+            });
+            setClickedDensityArea(null);
+          });
+          webMarkersRef.current.push(marker);
+          visibleCount += 1;
         }
-        if (completed === queries.length) webEmitSummary(visibleCount);
-      });
-    });
+      }
+    }
+
+    w.naver.maps.Service.geocode(
+      {
+        query: center.y + ',' + center.x,
+        coordinate: center.y + ',' + center.x,
+        orders: 'addr',
+        count: 1,
+      },
+      (status: any, response: any) => {
+        if (
+          status !== w.naver.maps.Service.Status.OK
+          || !response
+          || !response.v2
+          || !response.v2.addresses
+          || response.v2.addresses.length === 0
+        ) {
+          webEmitSummary(0);
+          return;
+        }
+        const centerAddr = response.v2.addresses[0];
+        let sido = '';
+        let sigugun = '';
+        let dongmyun = '';
+        (centerAddr.addressElements || []).forEach((el: any) => {
+          (el.types || []).forEach((t: string) => {
+            if (t === 'SIDO') sido = el.longName || '';
+            if (t === 'SIGUGUN') sigugun = el.longName || '';
+            if (t === 'DONGMYUN') dongmyun = el.longName || '';
+          });
+        });
+        const region = [sido, sigugun, dongmyun].filter(Boolean).join(' ');
+
+        let remaining = keywords.length;
+        keywords.forEach((keyword) => {
+          const combined = region ? region + ' ' + keyword : keyword;
+          w.naver.maps.Service.geocode(
+            { query: combined, coordinate: `${center.y},${center.x}`, count: 20 },
+            (status: any, response: any) => {
+              remaining -= 1;
+              if (
+                status === w.naver.maps.Service.Status.OK
+                && response
+                && response.v2
+                && response.v2.addresses
+                && response.v2.addresses.length > 0
+              ) {
+                response.v2.addresses.forEach((item: any) => {
+                  const lat = Number(item.y);
+                  const lng = Number(item.x);
+                  if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+                    placeMarker(keyword, item.roadAddress || item.jibunAddress || '', lat, lng);
+                  }
+                });
+              }
+              if (remaining === 0) webEmitSummary(visibleCount);
+            },
+          );
+        });
+      },
+    );
   }, [webClearMarkers, webEmitSummary]);
 
   useEffect(() => {
