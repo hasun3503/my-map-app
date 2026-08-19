@@ -89,10 +89,10 @@ interface ClickedDensityArea {
  * 첫 번째 키워드가 실제 검색에 사용됩니다.
  */
 const PLACE_KEYWORDS: Record<PlaceFilter, string[]> = {
-  주민센터: ['행정동', '주민센터', '행정복지센터', '행정센터', '무더위쉼터', '주민자치센터'],
-  운동센터: ['체육관', '운동센터', '스포츠센터', '피트니스센터', '구민체육센터'],
-  '지역사업 찾기': ['일자리센터', '평생학습센터', '지역사업', '복지사업', '사회적경제지원센터'],
-  공원: ['공원', '근린공원', '쉼터', '광장', '도시숲', '산책로'],
+  주민센터: ['주민센터', '행정복지센터', '주민자치센터'],
+  운동센터: ['체육관', '스포츠센터', '구민체육센터'],
+  '지역사업 찾기': ['일자리센터', '평생학습센터', '사회적경제지원센터'],
+  공원: ['공원', '근린공원', '도시숲'],
   지하철: ['지하철역', '전철역'],
   'Q&A': [],
 };
@@ -149,7 +149,6 @@ const DENSITY_COLOR_MAP: Record<DensityLevel, string> = {
  * .env 파일에 저장된 값을 사용합니다.
  */
 const clientId = process.env.EXPO_PUBLIC_NAVER_MAP_CLIENT_ID ?? '';
-const clientSecret = process.env.EXPO_PUBLIC_NAVER_MAP_CLIENT_SECRET ?? '';
 
 // ==================== 헬퍼 함수 ====================
 
@@ -221,6 +220,9 @@ export default function MapScreen() {
 
   /** 필터 검색으로 얻은 전체 결과 목록입니다. 화면 표시용으로 bounds 필터링이 적용됩니다. */
   const [searchResults, setSearchResults] = useState<SearchPlace[]>([]);
+
+  /** 네이버 지도 객체가 생성된 뒤에만 검색을 돌리기 위한 플래그입니다. */
+  const [mapReady, setMapReady] = useState(false);
 
   // ==================== 파생 값 ====================
 
@@ -453,35 +455,33 @@ export default function MapScreen() {
       const lng = Number(place.x);
       if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
         const latLng = new naver.maps.LatLng(lat, lng);
-        if (bounds.hasLatLng(latLng)) {
-          const marker = new naver.maps.Marker({
-            position: latLng,
-            map,
-            title: place.name,
-            zIndex: 10,
-            icon: {
-              content: `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28'><circle cx='14' cy='14' r='10' fill='${
-                filter === '주민센터' ? '#4285F4' : filter === '운동센터' ? '#34A853' : filter === '공원' ? '#FFD600' : filter === '지하철' ? '#263B80' : '#666'
-              }' stroke='#fff' stroke-width='2'/></svg>`,
-            },
+        const marker = new naver.maps.Marker({
+          position: latLng,
+          map,
+          title: place.name,
+          zIndex: 10,
+          icon: {
+            content: `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28'><circle cx='14' cy='14' r='10' fill='${
+              filter === '주민센터' ? '#4285F4' : filter === '운동센터' ? '#34A853' : filter === '공원' ? '#FFD600' : filter === '지하철' ? '#263B80' : '#666'
+            }' stroke='#fff' stroke-width='2'/></svg>`,
+          },
+        });
+        naver.maps.Event.addListener(marker, 'click', () => {
+          setSelectedPlace({
+            name: place.name,
+            address: place.address || '주소 정보 없음',
+            category: categoryLabel,
+            x: lng,
+            y: lat,
           });
-          naver.maps.Event.addListener(marker, 'click', () => {
-            setSelectedPlace({
-              name: place.name,
-              address: place.address || '주소 정보 없음',
-              category: categoryLabel,
-              x: lng,
-              y: lat,
-            });
-            setClickedDensityArea(null);
-          });
-          markersRef.current.push(marker);
-          visibleCount += 1;
-        }
+          setClickedDensityArea(null);
+        });
+        markersRef.current.push(marker);
+        if (bounds.hasLatLng(latLng)) visibleCount += 1;
       }
     });
-    emitSummary(visibleCount);
-    console.log(`[Map] 마커 표시 완료 - 표시된 마커 수: ${visibleCount}`);
+    emitSummary(visibleCount || places.length);
+    console.log(`[Map] 마커 표시 완료 - 표시된 마커 수: ${markersRef.current.length}`);
   }, [clearMarkers, emitSummary]);
 
   // ==================== 필터 처리 ====================
@@ -561,15 +561,8 @@ export default function MapScreen() {
   useEffect(() => {
     const win = window as any;
     const existingScript = document.getElementById('naver-map-script');
-    const hasSearchService = !!(win.naver && win.naver.maps && win.naver.maps.Service && typeof win.naver.maps.Service.search === 'function');
 
-    // services 서브모듈 없이 로드된 이전 스크립트가 있으면 제거하고 services 포함 스크립트를 다시 로드합니다.
-    if (existingScript && existingScript.dataset.loaded === 'true' && !hasSearchService) {
-      existingScript.remove();
-    }
-
-    const loadedScript = document.getElementById('naver-map-script');
-    if (loadedScript && loadedScript.dataset.loaded === 'true' && hasSearchService) {
+    if (existingScript && existingScript.dataset.loaded === 'true') {
       if (!naverMapInitRef.current) {
         const naver = win.naver;
         const container = mapContainerRef.current;
@@ -582,6 +575,7 @@ export default function MapScreen() {
             maxZoom: 19,
           };
           naverMapRef.current = new naver.maps.Map(container, mapOptions);
+          setMapReady(true);
           renderDensityPolygons();
           naver.maps.Event.addListener(naverMapRef.current, 'idle', () => {
             if (activeFilterRef.current) renderSearchMarkers(searchResultsRef.current);
@@ -595,7 +589,7 @@ export default function MapScreen() {
     const script = document.createElement('script');
     script.id = 'naver-map-script';
     script.type = 'text/javascript';
-    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}&submodules=geocoder,services`;
+    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}&submodules=geocoder`;
     script.onload = () => {
       script.dataset.loaded = 'true';
       naverScriptLoadedRef.current = true;
@@ -614,6 +608,7 @@ export default function MapScreen() {
         maxZoom: 19,
       };
       naverMapRef.current = new naver.maps.Map(container, mapOptions);
+      setMapReady(true);
 
       // 지도에 밀집 구역 폴리곤을 처음 한 번 그려줍니다.
       renderDensityPolygons();
@@ -635,26 +630,114 @@ export default function MapScreen() {
   // ==================== 장소 검색 ====================
 
   /**
-   * 필터가 변경될 때마다 네이버 지도 JS SDK(Service)로 장소를 검색합니다.
-   * 브라우저에서는 Naver OpenAPI REST(openapi.naver.com)가 CORS를 허용하지 않으므로
-   * 지도 스크립트에 포함된 naver.maps.Service API를 사용합니다.
+   * 필터가 변경될 때마다 서버 프록시(/api/search)로 네이버 지역검색을 호출합니다.
+   * 브라우저는 openapi.naver.com CORS를 허용하지 않으므로 서버에서만 검색 API를 호출합니다.
    *
-   * 1. 지도 중심 좌표를 reverseGeocode SDK로 지역명(시/구)을 알아냅니다.
-   * 2. 지역명 + 키워드로 Service.search 또는 Service.geocode 에서 장소 목록을 받아옵니다.
-   * 3. 결과를 지도에 마커로 표시합니다.
+   * 1. 지도 중심 좌표를 reverseGeocode로 시/구 이름을 얻습니다.
+   * 2. 지역명 + 키워드로 /api/search 를 호출합니다.
+   * 3. mapx/mapy 를 WGS84로 변환한 뒤 마커로 표시합니다.
    */
   useEffect(() => {
-    // 필터가 없거나 API 키가 없으면 검색하지 않습니다.
-    if (!activeFilter || !clientId || !clientSecret || !naverMapRef.current) return;
+    if (!activeFilter || !mapReady || !naverMapRef.current) return;
     const keywords = PLACE_KEYWORDS[activeFilter] || [];
     if (keywords.length === 0) return;
 
     let cancelled = false;
-    const keyword = keywords[0];  // 첫 번째 키워드로 검색합니다.
 
-    /** 좌표가 WGS84(위경도) 범위인지 판별합니다. 한국은 경도 124~132, 위도 33~43입니다. */
     function isWgs84(x: number, y: number) {
       return x > 110 && x < 140 && y > 20 && y < 50;
+    }
+
+    function toWgs84(rawX: number, rawY: number, naver: any): { x: number; y: number } | null {
+      if (Number.isNaN(rawX) || Number.isNaN(rawY)) return null;
+      if (isWgs84(rawX, rawY)) return { x: rawX, y: rawY };
+
+      // 최근 지역검색은 경위도 * 10,000,000 정수로 내려오는 경우가 있습니다.
+      if (Math.abs(rawX) > 1e7 && Math.abs(rawY) > 1e6) {
+        const x = rawX / 1e7;
+        const y = rawY / 1e7;
+        if (isWgs84(x, y)) return { x, y };
+      }
+
+      const Trans = naver?.maps?.TransCoord;
+      const Point = naver?.maps?.Point;
+      try {
+        if (Trans?.fromTM128ToLatLng && Point) {
+          const ll = Trans.fromTM128ToLatLng(new Point(rawX, rawY));
+          const x = ll.lng();
+          const y = ll.lat();
+          if (isWgs84(x, y)) return { x, y };
+        }
+        if (Trans?.fromKATECToLatLng) {
+          const ll = Trans.fromKATECToLatLng(rawX, rawY);
+          const x = ll.lng();
+          const y = ll.lat();
+          if (isWgs84(x, y)) return { x, y };
+        }
+      } catch (convErr) {
+        console.warn('[Map] 좌표 변환 실패:', convErr, rawX, rawY);
+      }
+      return null;
+    }
+
+    async function resolveRegion(naver: any, center: any): Promise<string> {
+      const Service = naver?.maps?.Service;
+      if (!Service || typeof Service.reverseGeocode !== 'function') return '';
+      return new Promise<string>((resolve) => {
+        Service.reverseGeocode(
+          { coords: new naver.maps.LatLng(center.lat(), center.lng()) },
+          (status: any, response: any) => {
+            try {
+              if (status !== Service.Status.OK || !response) {
+                resolve('');
+                return;
+              }
+              const v2 = response.v2 || response;
+              let area1 = '';
+              let area2 = '';
+              const results = v2.results;
+              if (Array.isArray(results) && results.length > 0) {
+                const reg = results[0].region;
+                if (reg) {
+                  area1 = String(reg.area1?.name || '');
+                  area2 = String(reg.area2?.name || '');
+                }
+              }
+              if (!area1 && !area2 && Array.isArray(v2.addressElements)) {
+                v2.addressElements.forEach((el: any) => {
+                  if (el.types && el.types.includes('SIDO')) area1 = String(el.longName || '');
+                  if (el.types && el.types.includes('SIGUGUN')) area2 = String(el.longName || '');
+                });
+              }
+              if (!area1 && !area2) {
+                const addrField = v2.address;
+                const addrStr = typeof addrField === 'string'
+                  ? addrField
+                  : typeof v2.jibunAddress === 'string'
+                    ? v2.jibunAddress
+                    : '';
+                const tokens = addrStr.trim().split(/\s+/).filter(Boolean);
+                if (tokens.length >= 1) area1 = tokens[0];
+                if (tokens.length >= 2) area2 = tokens[1];
+              }
+              resolve(`${area1} ${area2}`.trim());
+            } catch {
+              resolve('');
+            }
+          }
+        );
+      });
+    }
+
+    async function fetchLocalItems(query: string): Promise<any[]> {
+      const params = new URLSearchParams({ query });
+      const res = await fetch(`/api/search?${params.toString()}`);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        console.warn('[Map] /api/search 실패:', res.status, query, data?.errorCode || data?.error || data?.errorMessage);
+        return [];
+      }
+      return Array.isArray(data.items) ? data.items : [];
     }
 
     async function search() {
@@ -668,163 +751,30 @@ export default function MapScreen() {
           console.error('[Map] naver.maps 로드 안 됨');
           return;
         }
-        const Service = naver.maps.Service;
 
-        // 1단계: 지도 중심 좌표를 reverseGeocode SDK로 지역명(시/구)을 얻습니다.
-        let region = '';
-        if (Service && typeof Service.reverseGeocode === 'function') {
-          try {
-            region = await new Promise<string>((resolve) => {
-              Service.reverseGeocode(
-                { coords: new naver.maps.LatLng(center.lat(), center.lng()) },
-                (status: any, response: any) => {
-                  try {
-                    if (status !== Service.Status.OK || !response) {
-                      resolve('');
-                      return;
-                    }
-                    const v2 = response.v2 || response;
-                    let area1 = '';
-                    let area2 = '';
-
-                    // 1) results[0].region.area1/area2.name (SDK 표준 응답)
-                    const results = v2.results;
-                    if (Array.isArray(results) && results.length > 0) {
-                      const reg = results[0].region;
-                      if (reg) {
-                        area1 = String(reg.area1?.name || '');
-                        area2 = String(reg.area2?.name || '');
-                      }
-                    }
-
-                    // 2) addressElements의 SIDO/SIGUGUN
-                    if (!area1 && !area2 && Array.isArray(v2.addressElements)) {
-                      v2.addressElements.forEach((el: any) => {
-                        if (el.types && el.types.includes('SIDO')) area1 = String(el.longName || '');
-                        if (el.types && el.types.includes('SIGUGUN')) area2 = String(el.longName || '');
-                      });
-                    }
-
-                    // 3) jibunAddress/address 문자열에서 "시 도 구" 분리
-                    if (!area1 && !area2) {
-                      const addrField = v2.address;
-                      // address가 객체면 jibunAddress 사용, 문자열이면 그대로
-                      const addrStr = typeof addrField === 'string'
-                        ? addrField
-                        : typeof v2.jibunAddress === 'string'
-                          ? v2.jibunAddress
-                          : '';
-                      const tokens = addrStr.trim().split(/\s+/).filter(Boolean);
-                      // 예: "서울특별시 강남구 역삼1동 123" → ["서울특별시", "강남구", "역삼1동", "123"]
-                      if (tokens.length >= 1) area1 = tokens[0];
-                      if (tokens.length >= 2) area2 = tokens[1];
-                    }
-
-                    resolve(`${area1} ${area2}`.trim());
-                  } catch {
-                    resolve('');
-                  }
-                }
-              );
-            });
-          } catch (e) {
-            console.warn('[Map] reverseGeocode(SDK) 실패:', e);
-          }
-        }
+        const region = await resolveRegion(naver, center);
         console.log('[Map] 검색 지역:', region || '(지역명 없음)');
 
-        const query = region ? `${region} ${keyword}` : keyword;
-        console.log('[Map] 검색어:', query);
+        const queries = keywords.slice(0, 3).map((keyword) => (region ? `${region} ${keyword}` : keyword));
+        console.log('[Map] 검색어:', queries);
 
-        let places: SearchPlace[] = [];
+        const batches = await Promise.all(queries.map((query) => fetchLocalItems(query)));
+        const merged = new Map<string, SearchPlace>();
 
-        // 2단계: naver.maps.Service.search (JS SDK 지역 검색)를 시도합니다.
-        // services 서브모듈과 동일한 ncpKeyId로 인증되므로 추가 인증/프록시가 필요 없습니다.
-        if (Service && typeof Service.search === 'function') {
-          try {
-            places = await new Promise<SearchPlace[]>((resolve, reject) => {
-              Service.search(
-                { query, count: 20, start: 1 },
-                (status: any, response: any) => {
-                  try {
-                    if (status !== Service.Status.OK || !response) {
-                      resolve([]);
-                      return;
-                    }
-                    const v2 = response.v2 || response;
-                    const items = (v2 && v2.items) || [];
-                    const normalized = items
-                      .map((it: any) => {
-                        const rawX = Number(it.mapx ?? it.x ?? it.lng);
-                        const rawY = Number(it.mapy ?? it.y ?? it.lat);
-                        let x = rawX;
-                        let y = rawY;
-                        if (!isWgs84(x, y) && naver.maps.TransCoord && naver.maps.TransCoord.fromKATECToLatLng) {
-                          try {
-                            const ll = naver.maps.TransCoord.fromKATECToLatLng(rawX, rawY);
-                            x = ll.lng();
-                            y = ll.lat();
-                          } catch (convErr) {
-                            console.warn('[Map] 좌표 변환 실패:', convErr, rawX, rawY);
-                          }
-                        }
-                        return {
-                          name: String(it.title || it.name || '').replace(/<[^>]*>/g, ''),
-                          address: it.roadAddress || it.address || '',
-                          x,
-                          y,
-                        };
-                      })
-                      .filter((p: SearchPlace) => !Number.isNaN(p.x) && !Number.isNaN(p.y));
-                    resolve(normalized);
-                  } catch (e) {
-                    reject(e);
-                  }
-                }
-              );
-            });
-            console.log('[Map] Service.search 결과 수:', places.length);
-          } catch (e) {
-            console.warn('[Map] Service.search 실패:', e);
+        batches.flat().forEach((it: any) => {
+          const rawX = Number(it.mapx ?? it.x ?? it.lng);
+          const rawY = Number(it.mapy ?? it.y ?? it.lat);
+          const ll = toWgs84(rawX, rawY, naver);
+          if (!ll) return;
+          const name = String(it.title || it.name || '').replace(/<[^>]*>/g, '');
+          const address = String(it.roadAddress || it.address || '');
+          const key = `${name}|${ll.x.toFixed(5)}|${ll.y.toFixed(5)}`;
+          if (!merged.has(key)) {
+            merged.set(key, { name, address, x: ll.x, y: ll.y });
           }
-        }
+        });
 
-        // 3단계: 검색 결과가 없으면 Service.geocode(주소 지오코딩)로 폴백합니다.
-        if (places.length === 0 && Service && typeof Service.geocode === 'function') {
-          try {
-            places = await new Promise<SearchPlace[]>((resolve, reject) => {
-              Service.geocode(
-                { query, count: 20 },
-                (status: any, response: any) => {
-                  try {
-                    if (status !== Service.Status.OK) {
-                      resolve([]);
-                      return;
-                    }
-                    const v2 = response && (response.v2 || response);
-                    const addresses = (v2 && v2.addresses) || [];
-                    const normalized = addresses
-                      .map((addr: any) => ({
-                        name: addr.roadAddress || addr.jibunAddress || addr.address || query,
-                        address: addr.roadAddress || addr.jibunAddress || '',
-                        x: Number(addr.x),
-                        y: Number(addr.y),
-                      }))
-                      .filter((p: SearchPlace) => !Number.isNaN(p.x) && !Number.isNaN(p.y));
-                    resolve(normalized);
-                  } catch (e) {
-                    reject(e);
-                  }
-                }
-              );
-            });
-            console.log('[Map] Service.geocode 결과 수:', places.length);
-          } catch (e) {
-            console.warn('[Map] Service.geocode 실패:', e);
-          }
-        }
-
-        places = places.filter((p) => !Number.isNaN(p.x) && !Number.isNaN(p.y));
+        const places = Array.from(merged.values());
         console.log('[Map] 변환된 장소:', places);
 
         if (!cancelled) {
@@ -846,7 +796,7 @@ export default function MapScreen() {
     return () => {
       cancelled = true;
     };
-  }, [activeFilter, clientId, clientSecret, renderSearchMarkers]);
+  }, [activeFilter, mapReady, renderSearchMarkers]);
 
   // ==================== 하단 정보 바 데이터 ====================
 
