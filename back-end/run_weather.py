@@ -15,14 +15,25 @@ CONDITION_LABELS = {
 }
 
 
+def format_condition(condition: str | None) -> str:
+    if condition is None:
+        return "-"
+
+    if "_to_" in condition:
+        start, end = condition.split("_to_", maxsplit=1)
+        return (
+            f"{CONDITION_LABELS.get(start, start)}"
+            f" → "
+            f"{CONDITION_LABELS.get(end, end)}"
+        )
+
+    return CONDITION_LABELS.get(condition, condition)
+
 def format_value(value, suffix=""):
     if value is None:
         return "-"
     return f"{value}{suffix}"
 
-
-def format_condition(condition: str) -> str:
-    return CONDITION_LABELS.get(condition, condition)
 
 
 async def main():
@@ -82,6 +93,36 @@ async def main():
         )
 
     print("\n" + "=" * 56)
+
+    print("\n[ 주간 예보 ]")
+    print("-" * 72)
+    print(f"{'날짜':<16} {'날씨':<22} {'강수확률':>10} {'최저':>10} {'최고':>10}")
+    print("-" * 72)
+
+    for item in result.weekly:
+        rain_probability = (
+            f"{item.rain_probability_percent}%"
+            if item.rain_probability_percent is not None
+            else "-"
+        )
+        min_temperature = (
+            f"{item.min_temperature_c:.1f}°C"
+            if item.min_temperature_c is not None
+            else "-"
+        )
+        max_temperature = (
+            f"{item.max_temperature_c:.1f}°C"
+            if item.max_temperature_c is not None
+            else "-"
+        )
+
+        print(
+            f"{item.date:%Y-%m-%d}      "
+            f"{format_condition(item.condition):<20} "
+            f"{rain_probability:>10} "
+            f"{min_temperature:>10} "
+            f"{max_temperature:>10}"
+        )
 
 
 asyncio.run(main())

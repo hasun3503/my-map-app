@@ -1,51 +1,34 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, Text, View } from 'react-native';
 
-import { COLORS, SPACING, RADIUS } from '@/constants/theme';
+import { COLORS, SPACING } from '@/constants/theme';
 
-type ScreenHeaderProps = {
-  location: string;
-};
-
-export default function ScreenHeader({ location }: ScreenHeaderProps) {
+export default function ScreenHeader({ location }: { location: string }) {
   return (
-    <View style={styles.container}>
-      <View>
-        <Text style={styles.caption}>현재 위치</Text>
-        <Text style={styles.location}>{location}</Text>
-      </View>
-      <View style={styles.badge}>
-        <Ionicons name="location-outline" size={16} color={COLORS.textPrimary} />
+    <View style={styles.header}>
+      <View style={styles.locationRow}>
+        <Ionicons name="locate-outline" size={22} color={COLORS.accent} />
+        <Text style={styles.locationText}>{location}</Text>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  header: {
     paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
+    paddingTop: 8,
+    paddingBottom: SPACING.md,
   },
-  caption: {
-    color: COLORS.textMuted,
-    fontSize: 12,
-    marginBottom: 2,
-  },
-  location: {
-    color: COLORS.textPrimary,
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  badge: {
-    width: 34,
-    height: 34,
-    borderRadius: RADIUS.pill,
-    backgroundColor: COLORS.cardAlt,
+  locationRow: {
     alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  locationText: {
+    color: COLORS.textPrimary,
+    flexShrink: 1,
+    fontSize: 20,
+    fontWeight: '800',
   },
 });

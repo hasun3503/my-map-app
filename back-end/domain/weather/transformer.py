@@ -74,6 +74,27 @@ def _group_forecasts(
     return grouped
 
 
+def _current_condition(
+    current_values: dict[str, str],
+    grouped: dict[datetime, dict[str, str]],
+    current_at: datetime,
+) -> str:
+    """실황 날씨 상태가 없으면 가장 가까운 시간별 예보 상태로 보완한다."""
+    condition = _condition(current_values)
+
+    if condition != "unknown" or not grouped:
+        return condition
+
+    nearest_forecast_at = min(
+        grouped,
+        key=lambda forecast_at: abs(
+            (forecast_at - current_at).total_seconds()
+        ),
+    )
+
+    return _condition(grouped[nearest_forecast_at])
+
+
 def normalize_weather(
     raw: dict[str, list[dict]],
     latitude: float,
@@ -87,9 +108,9 @@ def normalize_weather(
         for item in raw.get("current", [])
     }
 
-    temperature = _number(current_values.get("T1H"))
-    humidity = _number(current_values.get("REH"))
-    wind_speed = _number(current_values.get("WSD"))
+    current_temperature = _number(current_values.get("T1H"))
+    current_humidity = _number(current_values.get("REH"))
+    current_wind_speed = _number(current_values.get("WSD"))
 
     current_at = requested_at.astimezone(KST).replace(
         minute=0,
@@ -97,25 +118,29 @@ def normalize_weather(
         microsecond=0,
     )
 
-    current = CurrentWeather(
-        observed_at=current_at,
-        temperature_c=temperature,
-        humidity_percent=humidity,
-        wind_speed_mps=wind_speed,
-        wind_direction_deg=_number(current_values.get("VEC")),
-        feels_like_c=calculate_feels_like(
-            temperature,
-            humidity,
-            wind_speed,
-        ),
-        condition=_condition(current_values),
-    )
-
     forecast_items = [
         *raw.get("ultra", []),
         *raw.get("village", []),
     ]
     grouped = _group_forecasts(forecast_items)
+
+    current = CurrentWeather(
+        observed_at=current_at,
+        temperature_c=current_temperature,
+        humidity_percent=current_humidity,
+        wind_speed_mps=current_wind_speed,
+        wind_direction_deg=_number(current_values.get("VEC")),
+        feels_like_c=calculate_feels_like(
+            current_temperature,
+            current_humidity,
+            current_wind_speed,
+        ),
+        condition=_current_condition(
+            current_values=current_values,
+            grouped=grouped,
+            current_at=current_at,
+        ),
+    )
 
     hourly: list[HourlyWeather] = []
     daily_values: dict[date, list[tuple[float, str]]] = defaultdict(list)

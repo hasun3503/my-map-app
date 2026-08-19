@@ -31,6 +31,16 @@ class DailyWeather:
 
 
 @dataclass
+class WeeklyWeather:
+    date: date
+    condition: str | None
+    min_temperature_c: float | None
+    max_temperature_c: float | None
+    rain_probability_percent: int | None = None
+    source: str = "mid_term"
+
+
+@dataclass
 class WeatherResult:
     latitude: float
     longitude: float
@@ -39,3 +49,4 @@ class WeatherResult:
     current: CurrentWeather
     hourly: list[HourlyWeather] = field(default_factory=list)
     daily: list[DailyWeather] = field(default_factory=list)
+    weekly: list[WeeklyWeather] = field(default_factory=list)
