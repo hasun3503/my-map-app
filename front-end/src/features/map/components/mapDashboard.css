@@ -1,0 +1,193 @@
+.map-dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 22px;
+  height: calc(100vh - 60px);
+  min-height: 620px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.map-dashboard__main-panel,
+.map-dashboard__side-panel {
+  background: #09162b;
+  border: 1px solid #1c2c49;
+  border-radius: 18px;
+  min-height: 0;
+}
+
+.map-dashboard__main-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  padding: 24px;
+}
+
+.map-dashboard__header {
+  flex: 0 0 auto;
+  margin-bottom: 16px;
+}
+
+.map-dashboard__heading-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.map-dashboard__title {
+  color: #ffffff;
+  font-size: 22px;
+  margin: 0;
+}
+
+.map-dashboard__description {
+  color: #71809a;
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
+.map-dashboard__legend {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+.map-dashboard__legend-item {
+  align-items: center;
+  color: #aebbd1;
+  display: inline-flex;
+  font-size: 12px;
+  gap: 5px;
+}
+
+.map-dashboard__legend-dot {
+  border-radius: 999px;
+  display: inline-block;
+  height: 9px;
+  width: 9px;
+}
+
+.map-dashboard__map-area {
+  flex: 1 1 auto;
+  min-height: 260px;
+}
+
+.map-dashboard__detail-area {
+  flex: 0 0 auto;
+  margin-top: 14px;
+  max-height: 188px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.map-dashboard__side-panel {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* 상세 패널이 가진 고정 최소 높이·큰 여백을 제거한다. */
+.selected-place-detail {
+  min-height: 0;
+}
+
+.selected-place-detail__content {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 12px 16px;
+}
+
+.selected-place-detail__metric {
+  background: #0b1830;
+  border-radius: 10px;
+  min-width: 0;
+  padding: 10px;
+}
+
+.selected-place-detail__metric-label {
+  color: #7385a4;
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+
+.selected-place-detail__metric-value {
+  color: #f3f6ff;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selected-place-detail__address {
+  border-top: 1px solid #263958;
+  padding: 10px 16px 12px;
+}
+
+/* 너비가 좁아지면 우측 패널을 아래로 이동한다. */
+@media (max-width: 1100px) {
+  .map-dashboard {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .map-dashboard__main-panel {
+    min-height: 680px;
+  }
+
+  .map-dashboard__side-panel {
+    height: 460px;
+  }
+}
+
+/* 모바일/좁은 태블릿: 제목·범례·상세 지표도 줄바꿈한다. */
+@media (max-width: 700px) {
+  .map-dashboard {
+    gap: 14px;
+  }
+
+  .map-dashboard__main-panel {
+    border-radius: 14px;
+    min-height: 620px;
+    padding: 16px;
+  }
+
+  .map-dashboard__heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .map-dashboard__legend {
+    justify-content: flex-start;
+    padding-top: 0;
+  }
+
+  .map-dashboard__map-area {
+    min-height: 300px;
+  }
+
+  .map-dashboard__detail-area {
+    max-height: none;
+  }
+
+  .selected-place-detail__content {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.selected-place-detail {
+  min-width: 0;
+}
+
+.selected-place-detail__address p {
+  min-width: 0;
+}

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import { COLORS } from '@/constants/theme';
+import { useCurrentLocation } from "@/hooks/useCurrentLocation";
 
 type Page = 'weather' | 'density' | 'map';
 
@@ -22,6 +23,19 @@ export default function DashboardLayout({
   children,
 }: Props) {
   const router = useRouter();
+
+  const {
+    location,
+    isLoading: isLocationLoading,
+  } = useCurrentLocation();
+
+  const currentLocationLabel = isLocationLoading
+    ? "현재 위치 확인 중"
+    : location
+      ? `${location.latitude.toFixed(
+          3,
+        )}, ${location.longitude.toFixed(3)}`
+      : "위치 정보 없음";
 
   return (
     <View style={styles.page}>
@@ -73,8 +87,11 @@ export default function DashboardLayout({
               size={13}
               color={COLORS.textSecondary}
             />
-            <Text style={styles.sidebarText}>
-              서울특별시 강남구
+            <Text
+              style={styles.sidebarText}
+              numberOfLines={1}
+            >
+              {currentLocationLabel}
             </Text>
           </View>
 
