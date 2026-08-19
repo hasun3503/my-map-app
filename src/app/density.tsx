@@ -1,158 +1,610 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import ScreenHeader from '../../components/ScreenHeader';
-import CongestionBadge, { CongestionLevel } from '../../components/CongestionBadge';
-import { COLORS, SPACING, RADIUS } from '../../constants/theme';
+import React from 'react';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
-const RECOMMENDATIONS: { name: string; population: string; level: CongestionLevel }[] = [
-  { name: '강남역 11번 출구', population: '약 4,500명', level: '매우혼잡' },
-  { name: '신사동 가로수길', population: '약 1,800명', level: '보통' },
-  { name: '코엑스몰 내부', population: '약 1,200명', level: '여유' },
-];
+import DashboardLayout from '@/components/DashboardLayout';
+import { COLORS, RADIUS, SPACING } from '@/constants/theme';
 
-const HOURLY_CONGESTION = [
-  { time: '12시', value: 0.25, color: COLORS.green },
-  { time: '14시', value: 0.45, color: COLORS.yellow },
-  { time: '16시', value: 0.75, color: COLORS.orange },
-  { time: '18시', value: 1, color: COLORS.red },
-  { time: '20시', value: 0.85, color: COLORS.orange },
+const LOCATIONS = [
+  {
+    name: '강남역 상권',
+    address: '강남역 11번 출구',
+    count: 67,
+    level: '매우 혼잡',
+    color: COLORS.red,
+  },
+  {
+    name: '신논현역 상권',
+    address: '신논현역 3번 출구',
+    count: 51,
+    level: '혼잡',
+    color: COLORS.orange,
+  },
+  {
+    name: '삼성역 상권',
+    address: '삼성역 5번 출구',
+    count: 30,
+    level: '보통',
+    color: COLORS.yellow,
+  },
+  {
+    name: '논현역 상권',
+    address: '논현역 1번 출구',
+    count: 18,
+    level: '여유',
+    color: COLORS.green,
+  },
 ];
 
 export default function DensityScreen() {
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScreenHeader location="서울특별시 강남구" />
+    <DashboardLayout activePage="density">
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
       >
-        {/* 지도 미리보기 - 실제 지도는 map.tsx 참고, 추후 react-native-maps로 교체 가능 */}
-        <View style={styles.mapPreview}>
-          <Ionicons name="location" size={28} color={COLORS.red} />
-          <Text style={styles.mapPreviewText}>지도 미리보기</Text>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.title}>유동인구</Text>
+            <Text style={styles.description}>
+              서울특별시 강남구의 실시간 유동인구를 확인하세요
+            </Text>
+          </View>
+
+          <Pressable style={styles.refreshButton}>
+            <Ionicons
+              name="refresh-outline"
+              size={14}
+              color={COLORS.textSecondary}
+            />
+            <Text style={styles.refreshText}>
+              새로고침
+            </Text>
+          </Pressable>
         </View>
 
-        {/* 범례 */}
-        <View style={styles.legendRow}>
-          <LegendDot color={COLORS.green} label="여유" />
-          <LegendDot color={COLORS.yellow} label="보통" />
-          <LegendDot color={COLORS.orange} label="혼잡" />
-          <LegendDot color={COLORS.red} label="매우혼잡" />
+        <View style={styles.summaryRow}>
+          <SummaryCard
+            title="현재 평균 유동인구"
+            value="41명"
+            description="현재 지역 평균"
+            color={COLORS.accent}
+          />
+
+          <SummaryCard
+            title="가장 혼잡한 지역"
+            value="강남역"
+            description="약 67명"
+            color={COLORS.red}
+          />
+
+          <SummaryCard
+            title="가장 여유로운 지역"
+            value="논현역"
+            description="약 18명"
+            color={COLORS.green}
+          />
         </View>
 
-        {/* 실시간 유동인구 추천 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>실시간 유동인구 추천</Text>
-          {RECOMMENDATIONS.map((item, i) => (
-            <View
-              key={item.name}
-              style={[styles.recommendRow, i === 0 && styles.recommendRowFirst]}
-            >
+        <View style={styles.contentGrid}>
+          <View style={[styles.card, styles.mapCard]}>
+            <View style={styles.cardHeader}>
               <View>
-                <Text style={styles.recommendName}>{item.name}</Text>
-                <Text style={styles.recommendPopulation}>{item.population}</Text>
+                <Text style={styles.cardTitle}>
+                  실시간 유동인구 지도
+                </Text>
+                <Text style={styles.cardDescription}>
+                  주요 지역의 현재 혼잡도를 표시합니다.
+                </Text>
               </View>
-              <CongestionBadge level={item.level} />
-            </View>
-          ))}
-        </View>
 
-        {/* 시간대별 혼잡도 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>시간대별 혼잡도</Text>
-          <View style={styles.chartRow}>
-            {HOURLY_CONGESTION.map((bar) => (
-              <View key={bar.time} style={styles.chartBarWrap}>
-                <View style={styles.chartBarTrack}>
+              <View style={styles.legend}>
+                <Legend color={COLORS.green} label="여유" />
+                <Legend color={COLORS.yellow} label="보통" />
+                <Legend color={COLORS.orange} label="혼잡" />
+                <Legend color={COLORS.red} label="매우 혼잡" />
+              </View>
+            </View>
+
+            <View style={styles.map}>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <View
+                  key={`h-${index}`}
+                  style={[
+                    styles.horizontalLine,
+                    { top: `${index * 20}%` },
+                  ]}
+                />
+              ))}
+
+              {Array.from({ length: 7 }).map((_, index) => (
+                <View
+                  key={`v-${index}`}
+                  style={[
+                    styles.verticalLine,
+                    { left: `${index * 16.6}%` },
+                  ]}
+                />
+              ))}
+
+              {LOCATIONS.map((item, index) => {
+                const positions = [
+                  { left: '18%', top: '23%' },
+                  { left: '50%', top: '50%' },
+                  { left: '72%', top: '22%' },
+                  { left: '29%', top: '72%' },
+                ];
+
+                return (
+                  <View
+                    key={item.name}
+                    style={[
+                      styles.marker,
+                      positions[index],
+                      {
+                        backgroundColor: item.color,
+                      },
+                    ]}
+                  >
+                    <Text style={styles.markerNumber}>
+                      {item.count}
+                    </Text>
+
+                    <Text style={styles.markerName}>
+                      {item.name.replace(' 상권', '')}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+
+          <View style={[styles.card, styles.listCard]}>
+            <Text style={styles.cardTitle}>
+              지역별 현황
+            </Text>
+
+            <Text style={styles.cardDescription}>
+              현재 측정된 유동인구 기준
+            </Text>
+
+            <View style={styles.locationList}>
+              {LOCATIONS.map((item) => (
+                <View
+                  key={item.name}
+                  style={styles.locationItem}
+                >
                   <View
                     style={[
-                      styles.chartBarFill,
-                      { height: `${bar.value * 100}%`, backgroundColor: bar.color },
+                      styles.locationColor,
+                      { backgroundColor: item.color },
+                    ]}
+                  />
+
+                  <View style={styles.locationInfo}>
+                    <Text style={styles.locationName}>
+                      {item.name}
+                    </Text>
+
+                    <Text style={styles.locationAddress}>
+                      {item.address}
+                    </Text>
+                  </View>
+
+                  <View style={styles.locationValue}>
+                    <Text
+                      style={[
+                        styles.locationLevel,
+                        { color: item.color },
+                      ]}
+                    >
+                      {item.level}
+                    </Text>
+
+                    <Text style={styles.locationCount}>
+                      {item.count}명
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <View>
+              <Text style={styles.cardTitle}>
+                시간대별 유동인구
+              </Text>
+
+              <Text style={styles.cardDescription}>
+                오늘 시간대별 예상 유동인구
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.chart}>
+            {[
+              ['12시', 0.25],
+              ['14시', 0.45],
+              ['16시', 0.7],
+              ['18시', 1],
+              ['20시', 0.8],
+            ].map(([time, value]) => (
+              <View
+                key={time as string}
+                style={styles.chartColumn}
+              >
+                <View style={styles.chartTrack}>
+                  <View
+                    style={[
+                      styles.chartBar,
+                      {
+                        height: `${Number(value) * 100}%`,
+                        backgroundColor:
+                          Number(value) >= 0.8
+                            ? COLORS.red
+                            : Number(value) >= 0.6
+                              ? COLORS.orange
+                              : Number(value) >= 0.4
+                                ? COLORS.yellow
+                                : COLORS.green,
+                      },
                     ]}
                   />
                 </View>
-                <Text style={styles.chartLabel}>{bar.time}</Text>
+
+                <Text style={styles.chartTime}>
+                  {time as string}
+                </Text>
               </View>
             ))}
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </DashboardLayout>
   );
 }
 
-function LegendDot({ color, label }: { color: string; label: string }) {
+function SummaryCard({
+  title,
+  value,
+  description,
+  color,
+}: {
+  title: string;
+  value: string;
+  description: string;
+  color: string;
+}) {
+  return (
+    <View style={styles.summaryCard}>
+      <View
+        style={[
+          styles.summaryDot,
+          { backgroundColor: color },
+        ]}
+      />
+
+      <Text style={styles.summaryTitle}>
+        {title}
+      </Text>
+
+      <Text style={styles.summaryValue}>
+        {value}
+      </Text>
+
+      <Text style={styles.summaryDescription}>
+        {description}
+      </Text>
+    </View>
+  );
+}
+
+function Legend({
+  color,
+  label,
+}: {
+  color: string;
+  label: string;
+}) {
   return (
     <View style={styles.legendItem}>
-      <View style={[styles.legendDot, { backgroundColor: color }]} />
-      <Text style={styles.legendLabel}>{label}</Text>
+      <View
+        style={[
+          styles.legendDot,
+          { backgroundColor: color },
+        ]}
+      />
+      <Text style={styles.legendText}>{label}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
-  scrollContent: { paddingHorizontal: SPACING.md, paddingBottom: SPACING.xl },
-  mapPreview: {
-    height: 140,
-    borderRadius: RADIUS.md,
-    backgroundColor: COLORS.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    marginBottom: SPACING.md,
+  scrollContent: {
+    padding: SPACING.lg,
+    gap: SPACING.md,
   },
-  mapPreviewText: { color: COLORS.textSecondary, fontSize: 13 },
-  legendRow: {
+
+  header: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: SPACING.md,
   },
-  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  legendDot: { width: 8, height: 8, borderRadius: 4 },
-  legendLabel: { color: COLORS.textSecondary, fontSize: 12 },
-  section: {
-    backgroundColor: COLORS.card,
-    borderRadius: RADIUS.md,
-    padding: SPACING.md,
-    marginBottom: SPACING.md,
-  },
-  sectionTitle: {
+
+  title: {
     color: COLORS.textPrimary,
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: SPACING.sm,
+    fontSize: 25,
+    fontWeight: '800',
   },
-  recommendRow: {
+
+  description: {
+    color: COLORS.textSecondary,
+    fontSize: 11,
+    marginTop: 4,
+  },
+
+  refreshButton: {
+    height: 34,
+    paddingHorizontal: 13,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.card,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: COLORS.border,
+    gap: 6,
   },
-  recommendRowFirst: {
-    borderTopWidth: 0,
+
+  refreshText: {
+    color: COLORS.textSecondary,
+    fontSize: 10,
   },
-  recommendName: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '600' },
-  recommendPopulation: { color: COLORS.textSecondary, fontSize: 12, marginTop: 2 },
-  chartRow: {
+
+  summaryRow: {
+    flexDirection: 'row',
+    gap: SPACING.md,
+  },
+
+  summaryCard: {
+    flex: 1,
+    minHeight: 115,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+  },
+
+  summaryDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 5,
+    marginBottom: 12,
+  },
+
+  summaryTitle: {
+    color: COLORS.textSecondary,
+    fontSize: 9,
+  },
+
+  summaryValue: {
+    color: COLORS.textPrimary,
+    fontSize: 22,
+    fontWeight: '800',
+    marginTop: 7,
+  },
+
+  summaryDescription: {
+    color: COLORS.textMuted,
+    fontSize: 9,
+    marginTop: 4,
+  },
+
+  contentGrid: {
+    flexDirection: 'row',
+    gap: SPACING.md,
+  },
+
+  card: {
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+  },
+
+  mapCard: {
+    flex: 1.5,
+    minHeight: 400,
+  },
+
+  listCard: {
+    flex: 0.8,
+  },
+
+  cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    height: 120,
+    alignItems: 'center',
+    marginBottom: SPACING.md,
   },
-  chartBarWrap: { alignItems: 'center', flex: 1 },
-  chartBarTrack: {
-    width: 20,
-    height: 90,
-    justifyContent: 'flex-end',
+
+  cardTitle: {
+    color: COLORS.textPrimary,
+    fontSize: 13,
+    fontWeight: '700',
   },
-  chartBarFill: {
-    width: '100%',
+
+  cardDescription: {
+    color: COLORS.textMuted,
+    fontSize: 9,
+    marginTop: 4,
+  },
+
+  legend: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+
+  legendDot: {
+    width: 7,
+    height: 7,
     borderRadius: 4,
   },
-  chartLabel: { color: COLORS.textSecondary, fontSize: 11, marginTop: 6 },
+
+  legendText: {
+    color: COLORS.textSecondary,
+    fontSize: 8,
+  },
+
+  map: {
+    height: 330,
+    borderRadius: RADIUS.md,
+    backgroundColor: '#0E1A30',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+
+  horizontalLine: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: '#1B2C48',
+  },
+
+  verticalLine: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 1,
+    backgroundColor: '#1B2C48',
+  },
+
+  marker: {
+    position: 'absolute',
+    width: 42,
+    height: 42,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 5,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+
+  markerNumber: {
+    color: COLORS.textPrimary,
+    fontSize: 10,
+    fontWeight: '800',
+  },
+
+  markerName: {
+    position: 'absolute',
+    top: 42,
+    width: 80,
+    textAlign: 'center',
+    color: COLORS.textSecondary,
+    fontSize: 8,
+  },
+
+  locationList: {
+    marginTop: SPACING.md,
+    gap: 8,
+  },
+
+  locationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.cardAlt,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.md,
+    padding: 10,
+  },
+
+  locationColor: {
+    width: 25,
+    height: 25,
+    borderRadius: 14,
+    marginRight: 9,
+  },
+
+  locationInfo: {
+    flex: 1,
+  },
+
+  locationName: {
+    color: COLORS.textPrimary,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+
+  locationAddress: {
+    color: COLORS.textMuted,
+    fontSize: 8,
+    marginTop: 3,
+  },
+
+  locationValue: {
+    alignItems: 'flex-end',
+  },
+
+  locationLevel: {
+    fontSize: 8,
+    fontWeight: '700',
+  },
+
+  locationCount: {
+    color: COLORS.textSecondary,
+    fontSize: 9,
+    marginTop: 3,
+  },
+
+  chart: {
+    height: 170,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-around',
+    marginTop: 10,
+  },
+
+  chartColumn: {
+    flex: 1,
+    alignItems: 'center',
+  },
+
+  chartTrack: {
+    height: 130,
+    width: 28,
+    backgroundColor: COLORS.cardAlt,
+    borderRadius: 7,
+    justifyContent: 'flex-end',
+    overflow: 'hidden',
+  },
+
+  chartBar: {
+    width: '100%',
+    borderRadius: 7,
+  },
+
+  chartTime: {
+    color: COLORS.textSecondary,
+    fontSize: 9,
+    marginTop: 7,
+  },
 });

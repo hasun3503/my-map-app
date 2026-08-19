@@ -1,0 +1,26 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.17.0
+2 info using node@v24.19.0
+3 silly config load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\hsb06\OneDrive\바탕 화면\my-map-app\.npmrc
+5 silly config load:file:C:\Users\hsb06\.npmrc
+6 silly config load:file:C:\Users\hsb06\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm explain expo-cli
+8 verbose argv "explain" "expo-cli" "--json"
+9 verbose logfile logs-max:10 dir:C:\Users\hsb06\OneDrive\바탕 화면\my-map-app\.npm-cache\_logs\2026-08-13T12_50_11_820Z-
+10 verbose logfile C:\Users\hsb06\OneDrive\바탕 화면\my-map-app\.npm-cache\_logs\2026-08-13T12_50_11_820Z-debug-0.log
+11 silly logfile start cleaning logs, removing 4 files
+12 silly packumentCache heap:2348810240 maxSize:587202560 maxEntrySize:293601280
+13 silly logfile done cleaning log files
+14 verbose stack Error: No dependencies found matching expo-cli
+14 verbose stack     at Explain.exec (C:\Program Files\nodejs\node_modules\npm\lib\commands\explain.js:56:13)
+14 verbose stack     at async Npm.exec (C:\Program Files\nodejs\node_modules\npm\lib\npm.js:193:9)
+14 verbose stack     at async module.exports (C:\Program Files\nodejs\node_modules\npm\lib\cli\entry.js:67:5)
+15 error No dependencies found matching expo-cli
+16 verbose cwd C:\Users\hsb06\OneDrive\바탕 화면\my-map-app
+17 verbose os Windows_NT 10.0.26200
+18 verbose node v24.19.0
+19 verbose npm  v11.17.0
+20 verbose exit 1
+21 verbose code 1
+22 error A complete log of this run can be found in: C:\Users\hsb06\OneDrive\바탕 화면\my-map-app\.npm-cache\_logs\2026-08-13T12_50_11_820Z-debug-0.log
