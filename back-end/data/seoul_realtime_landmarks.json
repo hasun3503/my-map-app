@@ -1,0 +1,662 @@
+[
+  {
+    "area_code": "POI003",
+    "area_name": "명동 관광특구",
+    "latitude": 37.5624807,
+    "longitude": 126.9851413
+  },
+  {
+    "area_code": "POI004",
+    "area_name": "이태원 관광특구",
+    "latitude": 37.5372766,
+    "longitude": 127.0023336
+  },
+  {
+    "area_code": "POI005",
+    "area_name": "잠실 관광특구",
+    "latitude": 37.5148002,
+    "longitude": 127.109244
+  },
+  {
+    "area_code": "POI006",
+    "area_name": "종로·청계 관광특구",
+    "latitude": 37.570213,
+    "longitude": 126.9952065
+  },
+  {
+    "area_code": "POI008",
+    "area_name": "경복궁",
+    "latitude": 37.4777008,
+    "longitude": 126.982236
+  },
+  {
+    "area_code": "POI009",
+    "area_name": "광화문·덕수궁",
+    "latitude": 37.5684246,
+    "longitude": 126.9782701
+  },
+  {
+    "area_code": "POI010",
+    "area_name": "보신각",
+    "latitude": 37.569795,
+    "longitude": 126.9835376
+  },
+  {
+    "area_code": "POI011",
+    "area_name": "서울 암사동 유적",
+    "latitude": 37.5606377,
+    "longitude": 127.1303479
+  },
+  {
+    "area_code": "POI012",
+    "area_name": "창덕궁·종묘",
+    "latitude": 37.5723746,
+    "longitude": 126.9724759
+  },
+  {
+    "area_code": "POI013",
+    "area_name": "가산디지털단지역",
+    "latitude": 37.4816317,
+    "longitude": 126.8825603
+  },
+  {
+    "area_code": "POI014",
+    "area_name": "강남역",
+    "latitude": 37.4979526,
+    "longitude": 127.0276242
+  },
+  {
+    "area_code": "POI015",
+    "area_name": "건대입구역",
+    "latitude": 37.5403718,
+    "longitude": 127.0692759
+  },
+  {
+    "area_code": "POI016",
+    "area_name": "고덕역",
+    "latitude": 37.555056,
+    "longitude": 127.1541261
+  },
+  {
+    "area_code": "POI017",
+    "area_name": "고속터미널역",
+    "latitude": 37.5049055,
+    "longitude": 127.0049753
+  },
+  {
+    "area_code": "POI018",
+    "area_name": "교대역",
+    "latitude": 37.4939732,
+    "longitude": 127.0146391
+  },
+  {
+    "area_code": "POI019",
+    "area_name": "구로디지털단지역",
+    "latitude": 37.485259,
+    "longitude": 126.9014991
+  },
+  {
+    "area_code": "POI020",
+    "area_name": "구로역",
+    "latitude": 37.5032764,
+    "longitude": 126.88222
+  },
+  {
+    "area_code": "POI021",
+    "area_name": "군자역",
+    "latitude": 37.5571918,
+    "longitude": 127.0794714
+  },
+  {
+    "area_code": "POI023",
+    "area_name": "대림역",
+    "latitude": 37.4934037,
+    "longitude": 126.8949143
+  },
+  {
+    "area_code": "POI024",
+    "area_name": "동대문역",
+    "latitude": 37.5717669,
+    "longitude": 127.0110854
+  },
+  {
+    "area_code": "POI025",
+    "area_name": "뚝섬역",
+    "latitude": 37.5472058,
+    "longitude": 127.0474047
+  },
+  {
+    "area_code": "POI026",
+    "area_name": "미아사거리역",
+    "latitude": 37.613283,
+    "longitude": 127.0301097
+  },
+  {
+    "area_code": "POI027",
+    "area_name": "발산역",
+    "latitude": 37.5586515,
+    "longitude": 126.8374004
+  },
+  {
+    "area_code": "POI029",
+    "area_name": "사당역",
+    "latitude": 37.4772357,
+    "longitude": 126.9817129
+  },
+  {
+    "area_code": "POI030",
+    "area_name": "삼각지역",
+    "latitude": 37.5344669,
+    "longitude": 126.9729252
+  },
+  {
+    "area_code": "POI031",
+    "area_name": "서울대입구역",
+    "latitude": 37.4812071,
+    "longitude": 126.9527294
+  },
+  {
+    "area_code": "POI032",
+    "area_name": "서울식물원·마곡나루역",
+    "latitude": 37.5660114,
+    "longitude": 126.8272708
+  },
+  {
+    "area_code": "POI033",
+    "area_name": "서울역",
+    "latitude": 37.553739,
+    "longitude": 126.9696659
+  },
+  {
+    "area_code": "POI034",
+    "area_name": "선릉역",
+    "latitude": 37.504585,
+    "longitude": 127.0492805
+  },
+  {
+    "area_code": "POI035",
+    "area_name": "성신여대입구역",
+    "latitude": 37.5927287,
+    "longitude": 127.0165313
+  },
+  {
+    "area_code": "POI036",
+    "area_name": "수유역",
+    "latitude": 37.6378308,
+    "longitude": 127.0254275
+  },
+  {
+    "area_code": "POI037",
+    "area_name": "신논현역·논현역",
+    "latitude": 37.5076811,
+    "longitude": 127.0267859
+  },
+  {
+    "area_code": "POI038",
+    "area_name": "신도림역",
+    "latitude": 37.5090119,
+    "longitude": 126.8915589
+  },
+  {
+    "area_code": "POI039",
+    "area_name": "신림역",
+    "latitude": 37.484248,
+    "longitude": 126.9297136
+  },
+  {
+    "area_code": "POI040",
+    "area_name": "신촌·이대역",
+    "latitude": 37.5571523,
+    "longitude": 126.9445241
+  },
+  {
+    "area_code": "POI041",
+    "area_name": "양재역",
+    "latitude": 37.4845515,
+    "longitude": 127.0339403
+  },
+  {
+    "area_code": "POI042",
+    "area_name": "역삼역",
+    "latitude": 37.5006431,
+    "longitude": 127.0363764
+  },
+  {
+    "area_code": "POI043",
+    "area_name": "연신내역",
+    "latitude": 37.619062,
+    "longitude": 126.9211923
+  },
+  {
+    "area_code": "POI044",
+    "area_name": "오목교역·목동운동장",
+    "latitude": 37.524547,
+    "longitude": 126.8751281
+  },
+  {
+    "area_code": "POI045",
+    "area_name": "왕십리역",
+    "latitude": 37.5618331,
+    "longitude": 127.0372192
+  },
+  {
+    "area_code": "POI046",
+    "area_name": "용산역",
+    "latitude": 37.529662,
+    "longitude": 126.9644553
+  },
+  {
+    "area_code": "POI047",
+    "area_name": "이태원역",
+    "latitude": 37.5345411,
+    "longitude": 126.9945906
+  },
+  {
+    "area_code": "POI048",
+    "area_name": "장지역",
+    "latitude": 37.4786788,
+    "longitude": 127.1261964
+  },
+  {
+    "area_code": "POI049",
+    "area_name": "장한평역",
+    "latitude": 37.5614836,
+    "longitude": 127.0646562
+  },
+  {
+    "area_code": "POI050",
+    "area_name": "천호역",
+    "latitude": 37.5385953,
+    "longitude": 127.1235513
+  },
+  {
+    "area_code": "POI051",
+    "area_name": "총신대입구(이수)역",
+    "latitude": 37.4866678,
+    "longitude": 126.9821752
+  },
+  {
+    "area_code": "POI052",
+    "area_name": "충정로역",
+    "latitude": 37.5596922,
+    "longitude": 126.9643318
+  },
+  {
+    "area_code": "POI053",
+    "area_name": "합정역",
+    "latitude": 37.5499338,
+    "longitude": 126.9145408
+  },
+  {
+    "area_code": "POI054",
+    "area_name": "혜화역",
+    "latitude": 37.5821476,
+    "longitude": 127.0018999
+  },
+  {
+    "area_code": "POI055",
+    "area_name": "홍대입구역(2호선)",
+    "latitude": 37.5570155,
+    "longitude": 126.9240192
+  },
+  {
+    "area_code": "POI056",
+    "area_name": "회기역",
+    "latitude": 37.5896861,
+    "longitude": 127.0578001
+  },
+  {
+    "area_code": "POI058",
+    "area_name": "가락시장",
+    "latitude": 37.4932278,
+    "longitude": 127.1107531
+  },
+  {
+    "area_code": "POI060",
+    "area_name": "광장(전통)시장",
+    "latitude": 37.5701661,
+    "longitude": 126.9990691
+  },
+  {
+    "area_code": "POI061",
+    "area_name": "김포공항",
+    "latitude": 37.5668999,
+    "longitude": 126.8012509
+  },
+  {
+    "area_code": "POI063",
+    "area_name": "노량진",
+    "latitude": 37.5131786,
+    "longitude": 126.9465552
+  },
+  {
+    "area_code": "POI064",
+    "area_name": "덕수궁길·정동길",
+    "latitude": 37.5648235,
+    "longitude": 126.9764916
+  },
+  {
+    "area_code": "POI066",
+    "area_name": "북촌한옥마을",
+    "latitude": 37.581354,
+    "longitude": 126.9850839
+  },
+  {
+    "area_code": "POI067",
+    "area_name": "서촌",
+    "latitude": 37.5764468,
+    "longitude": 126.9717062
+  },
+  {
+    "area_code": "POI068",
+    "area_name": "성수카페거리",
+    "latitude": 37.5399249,
+    "longitude": 127.0562377
+  },
+  {
+    "area_code": "POI070",
+    "area_name": "쌍문역",
+    "latitude": 37.6486101,
+    "longitude": 127.034689
+  },
+  {
+    "area_code": "POI071",
+    "area_name": "압구정로데오거리",
+    "latitude": 37.5268138,
+    "longitude": 127.0361236
+  },
+  {
+    "area_code": "POI072",
+    "area_name": "여의도",
+    "latitude": 37.5177232,
+    "longitude": 126.9345839
+  },
+  {
+    "area_code": "POI073",
+    "area_name": "연남동",
+    "latitude": 37.564501,
+    "longitude": 126.9220271
+  },
+  {
+    "area_code": "POI074",
+    "area_name": "영등포 타임스퀘어",
+    "latitude": 37.5178044,
+    "longitude": 126.9056077
+  },
+  {
+    "area_code": "POI076",
+    "area_name": "용리단길",
+    "latitude": 37.5313865,
+    "longitude": 126.9715193
+  },
+  {
+    "area_code": "POI077",
+    "area_name": "이태원 앤틱가구거리",
+    "latitude": 37.5317815,
+    "longitude": 126.9946622
+  },
+  {
+    "area_code": "POI078",
+    "area_name": "인사동",
+    "latitude": 37.5718987,
+    "longitude": 126.9872482
+  },
+  {
+    "area_code": "POI080",
+    "area_name": "청담동 명품거리",
+    "latitude": 37.5260738,
+    "longitude": 127.046307
+  },
+  {
+    "area_code": "POI082",
+    "area_name": "해방촌·경리단길",
+    "latitude": 37.5393117,
+    "longitude": 126.9875263
+  },
+  {
+    "area_code": "POI083",
+    "area_name": "DDP(동대문디자인플라자)",
+    "latitude": 37.5675465,
+    "longitude": 127.0099323
+  },
+  {
+    "area_code": "POI084",
+    "area_name": "DMC(디지털미디어시티)",
+    "latitude": 37.5770602,
+    "longitude": 126.8986602
+  },
+  {
+    "area_code": "POI085",
+    "area_name": "강서한강공원",
+    "latitude": 37.5879036,
+    "longitude": 126.815155
+  },
+  {
+    "area_code": "POI086",
+    "area_name": "고척돔",
+    "latitude": 37.4982105,
+    "longitude": 126.8672613
+  },
+  {
+    "area_code": "POI087",
+    "area_name": "광나루한강공원",
+    "latitude": 37.5583387,
+    "longitude": 127.1245699
+  },
+  {
+    "area_code": "POI088",
+    "area_name": "광화문광장",
+    "latitude": 37.5740533,
+    "longitude": 126.9768908
+  },
+  {
+    "area_code": "POI089",
+    "area_name": "국립중앙박물관·용산가족공원",
+    "latitude": 37.5209034,
+    "longitude": 126.9797339
+  },
+  {
+    "area_code": "POI090",
+    "area_name": "난지한강공원",
+    "latitude": 37.5672573,
+    "longitude": 126.8744074
+  },
+  {
+    "area_code": "POI091",
+    "area_name": "남산공원",
+    "latitude": 37.5510509,
+    "longitude": 126.9925089
+  },
+  {
+    "area_code": "POI092",
+    "area_name": "노들섬",
+    "latitude": 37.5176704,
+    "longitude": 126.9580519
+  },
+  {
+    "area_code": "POI093",
+    "area_name": "뚝섬한강공원",
+    "latitude": 37.5294517,
+    "longitude": 127.0706769
+  },
+  {
+    "area_code": "POI094",
+    "area_name": "망원한강공원",
+    "latitude": 37.5553018,
+    "longitude": 126.8952798
+  },
+  {
+    "area_code": "POI095",
+    "area_name": "반포한강공원",
+    "latitude": 37.5100172,
+    "longitude": 126.995032
+  },
+  {
+    "area_code": "POI096",
+    "area_name": "북서울꿈의숲",
+    "latitude": 37.6233355,
+    "longitude": 127.0407343
+  },
+  {
+    "area_code": "POI100",
+    "area_name": "서울대공원",
+    "latitude": 37.5498986,
+    "longitude": 127.0809212
+  },
+  {
+    "area_code": "POI101",
+    "area_name": "서울숲공원",
+    "latitude": 37.5419644,
+    "longitude": 127.0385663
+  },
+  {
+    "area_code": "POI102",
+    "area_name": "아차산",
+    "latitude": 37.5523098,
+    "longitude": 127.0899427
+  },
+  {
+    "area_code": "POI103",
+    "area_name": "양화한강공원",
+    "latitude": 37.5430082,
+    "longitude": 126.8957603
+  },
+  {
+    "area_code": "POI104",
+    "area_name": "어린이대공원",
+    "latitude": 37.5498986,
+    "longitude": 127.0809212
+  },
+  {
+    "area_code": "POI105",
+    "area_name": "여의도한강공원",
+    "latitude": 37.5263232,
+    "longitude": 126.9348268
+  },
+  {
+    "area_code": "POI106",
+    "area_name": "월드컵공원",
+    "latitude": 37.571805,
+    "longitude": 126.8789069
+  },
+  {
+    "area_code": "POI107",
+    "area_name": "응봉산",
+    "latitude": 37.5478268,
+    "longitude": 127.029725
+  },
+  {
+    "area_code": "POI108",
+    "area_name": "이촌한강공원",
+    "latitude": 37.5191001,
+    "longitude": 126.9652321
+  },
+  {
+    "area_code": "POI109",
+    "area_name": "잠실종합운동장",
+    "latitude": 37.5148022,
+    "longitude": 127.0736261
+  },
+  {
+    "area_code": "POI110",
+    "area_name": "잠실한강공원",
+    "latitude": 37.5188864,
+    "longitude": 127.0900268
+  },
+  {
+    "area_code": "POI111",
+    "area_name": "잠원한강공원",
+    "latitude": 37.5220602,
+    "longitude": 127.0124624
+  },
+  {
+    "area_code": "POI112",
+    "area_name": "청계산",
+    "latitude": 37.4429535,
+    "longitude": 127.0574716
+  },
+  {
+    "area_code": "POI114",
+    "area_name": "북창동 먹자골목",
+    "latitude": 37.5621868,
+    "longitude": 126.9787462
+  },
+  {
+    "area_code": "POI115",
+    "area_name": "남대문시장",
+    "latitude": 37.5570913,
+    "longitude": 126.9736575
+  },
+  {
+    "area_code": "POI116",
+    "area_name": "익선동",
+    "latitude": 37.574461,
+    "longitude": 126.9902618
+  },
+  {
+    "area_code": "POI117",
+    "area_name": "신정네거리역",
+    "latitude": 37.5202337,
+    "longitude": 126.8528679
+  },
+  {
+    "area_code": "POI118",
+    "area_name": "잠실새내역",
+    "latitude": 37.5115735,
+    "longitude": 127.086893
+  },
+  {
+    "area_code": "POI119",
+    "area_name": "잠실역",
+    "latitude": 37.5133493,
+    "longitude": 127.1001866
+  },
+  {
+    "area_code": "POI120",
+    "area_name": "잠실롯데타워·석촌호수",
+    "latitude": 37.5125702,
+    "longitude": 127.1025625
+  },
+  {
+    "area_code": "POI123",
+    "area_name": "보라매공원",
+    "latitude": 37.492333,
+    "longitude": 126.918289
+  },
+  {
+    "area_code": "POI124",
+    "area_name": "서대문독립공원",
+    "latitude": 37.5738289,
+    "longitude": 126.956771
+  },
+  {
+    "area_code": "POI125",
+    "area_name": "안양천",
+    "latitude": 37.516956,
+    "longitude": 126.8804507
+  },
+  {
+    "area_code": "POI127",
+    "area_name": "올림픽공원",
+    "latitude": 37.5209339,
+    "longitude": 127.122959
+  },
+  {
+    "area_code": "POI128",
+    "area_name": "홍제폭포",
+    "latitude": 37.589156,
+    "longitude": 126.9429508
+  },
+  {
+    "area_code": "POI129",
+    "area_name": "송현녹지광장",
+    "latitude": 37.576452,
+    "longitude": 126.981683
+  },
+  {
+    "area_code": "POI131",
+    "area_name": "숭례문",
+    "latitude": 37.5599757,
+    "longitude": 126.9753562
+  }
+]
